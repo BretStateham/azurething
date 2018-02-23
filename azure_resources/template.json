@@ -13,7 +13,7 @@
         "namespaceName": "[concat(parameters('name_prefix'),'ns')]",
         "rootKeyName": "RootManageSharedAccessKey",
         "eventHubName": "TemperatureAlerts",
-        "authorizationRules_readwrite_name": "readwrite",
+        "readwritePolicyName": "readwrite",
         "defaultConsumerGroupName": "$Default",
         "storageAccountName": "[concat(parameters('name_prefix'),'storage')]",
         "streamAnalyticsJobName": "[concat(parameters('name_prefix'),'job')]",
@@ -99,7 +99,7 @@
         {
             "comments": "Provision the 'readwrite' Shared Access Policy.",
             "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationRules",
-            "name": "[concat(parameters('namespaceName'), '/', parameters('eventHubName'), '/', parameters('authorizationRules_readwrite_name'))]",
+            "name": "[concat(variables('namespaceName'), '/', variables('eventHubName'), '/', variables('readwritePolicyName'))]",
             "apiVersion": "2017-04-01",
             "location": "West US",
             "scale": null,
@@ -110,8 +110,8 @@
                 ]
             },
             "dependsOn": [
-                "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaceName'))]",
-                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('namespaceName'), parameters('eventHubName'))]"
+                "[resourceId('Microsoft.EventHub/namespaces', variables('namespaceName'))]",
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('namespaceName'), variables('eventHubName'))]"
             ]
         },
         {
@@ -150,7 +150,7 @@
             "kind": "app",
             "name": "[variables('planName')]",
             "apiVersion": "2016-09-01",
-            "location": "[variables('planName')]",
+            "location": "[variables('location')]",
             "properties": {
                 "name": "[variables('planName')]"
             },
@@ -162,8 +162,7 @@
             "kind": "app",
             "name": "[variables('webAppName')]",
             "apiVersion": "2016-08-01",
-            "location": "West US",
-            "scale": null,
+            "location": "[variables('location')]",
             "properties": {
                 "enabled": true,
                 "hostNameSslStates": [
@@ -178,66 +177,10 @@
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]"
-            ]
-        },
-        {
-            "comments": "Provision the Web App Config.",
-            "type": "Microsoft.Web/sites/config",
-            "name": "[concat(variables('webAppName'), '/', variables('webAppConfigName'))]",
-            "apiVersion": "2016-08-01",
-            "location": "West US",
-            "tags": {
-                "hidden-related:/subscriptions/ed2f73c5-c021-4b86-9afb-aa7998d16085/resourcegroups/makemitgroup/providers/Microsoft.Web/serverfarms/makemitplan": "empty"
-            },
-            "scale": null,
-            "properties": {
-                "numberOfWorkers": 1,
-                "defaultDocuments": [
-                    "Default.htm",
-                    "Default.html",
-                    "Default.asp",
-                    "index.htm",
-                    "index.html",
-                    "iisstart.htm",
-                    "default.aspx",
-                    "index.php",
-                    "hostingstart.html"
-                ],
-                "netFrameworkVersion": "v4.0",
-                "phpVersion": "5.6",
-                "publishingUsername": "[concat('$' parameters('name_prefix'), parameters('webAppConfigName'))]",
-                "virtualApplications": [
-                    {
-                        "virtualPath": "/",
-                        "physicalPath": "site\\wwwroot",
-                        "preloadEnabled": false,
-                        "virtualDirectories": null
-                    }
-                ]
-                
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
-            ]
-        },
-        {
-            "comments": "Provision the Web Site URL.",
-            "type": "Microsoft.Web/sites/hostNameBindings",
-            "name": "[concat(variables('webAppName'), '/', variables('webAppUrl'))]",
-            "apiVersion": "2016-08-01",
-            "location": "[variables('location')]",
-            "scale": null,
-            "properties": {
-                "siteName": "[variables('webAppName')]",
-                "domainId": null,
-                "hostNameType": "Verified"
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('webAppName'))]"
             ]
         }
     ]
