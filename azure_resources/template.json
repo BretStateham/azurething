@@ -152,7 +152,7 @@
             "apiVersion": "2016-09-01",
             "location": "[variables('planName')]",
             "properties": {
-                "name": "[variables('planName')]",
+                "name": "[variables('planName')]"
             },
             "dependsOn": []
         },
