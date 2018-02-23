@@ -486,6 +486,65 @@ static const char connectionString[] = "[Device Connection String]";
 
 Head back to your Node application and you will have a fully functional command center, complete with a history of sensor data, alerts that display when the temperature got outside a certain range, and commands that you can send to your device remotely.
 
+1. If you want to monitor the messages from your device in the IoT Hub itself you can use the "iothub-explorer". To install it run:
+
+    ```bash
+    npm install -g iothub-explorer
+    ```
+
+1. The `iothub-explorer` command line tool let's you do a bunch of things with your IoT Hub.  However, it will need to be able to connect to your IoT Hub with the proper permissions.  To help it out, we'll get the connection string for the `iothubowner` Shared Access Policy.  `iothubowner` is a builtin set of credentials that applications can use to have full access to the IoT Hub.  To get the connection string, run:
+
+    ```bash
+    az iot hub show-connection-string --name <name_prefix>iot
+    ```
+
+    For example:
+
+    ```bash
+    az iot hub show-connection-string --name bssmakemitiot
+    ```
+
+    You should see output similar to the following:
+
+    ```bash
+    {
+        "connectionString": "HostName=bssmakemitiot.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=HVHeC2s5kz5oQq6FnaI842SKpgYQe="
+    }
+    ```
+
+    Copy JUST the value of the connection string (starts with '"HostName=....' and ends with '="'),.  You'll use that as the login credentials for the `iothub-explorer` in the next step. 
+
+1. To monitor the events (if any) sent by your device to the event hub, you can run the following:
+
+    ```bash
+    iothub-explorer monitor-events <name_prefix>thing -l "<CONNECTION STRING COPIED ABOVE>"
+    ```
+
+    For example
+
+    ```bash
+    iothub-explorer monitor-events bssmakemitthing -l "HostName=bssmakemitiot ...snip... 42SKpgYQe="
+    ```
+
+    If your device is sending messages you should see output similar to the following:
+
+    ```bash
+    Monitoring events from device thing...
+    ==== From: 'bssmakemitthing' at '2018-02-23T22:41:37.982Z' ====
+    {
+    "DeviceId": "bssmakemitthing",
+    "EventTime": 1519425696,
+    "MTemperature": 26,
+    "Humidity": 31
+    }
+    ---- application properties ----
+    {}
+    ====================
+
+    ...
+    
+    ```
+
 ***
 **Note:** Make sure to **stop** your Command Center jobs once you have when you finish to avoid unnecessary Azure consumption!  (See: [Troubleshooting](#troubleshooting))
 ***
