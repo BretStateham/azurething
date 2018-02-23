@@ -77,23 +77,27 @@
             ]
         },
         {
-            "comments": "Generalized from resource: '/subscriptions/ed2f73c5-c021-4b86-9afb-aa7998d16085/resourcegroups/makemitgroup/providers/Microsoft.EventHub/namespaces/makemitns/eventhubs/thingdeveventhub'.",
+            "comments": "Provision the TemperatureAlerts event hub",
             "type": "Microsoft.EventHub/namespaces/eventhubs",
-            "name": "[concat(parameters('namespaceName'), '/', parameters('eventHubName'))]",
+            "name": "[concat(variables('namespaceName'), '/', variables('eventHubName'))]",
             "apiVersion": "2017-04-01",
-            "location": "West US",
+            "location": "[variables('location')]",
             "scale": null,
             "properties": {
                 "messageRetentionInDays": 1,
                 "partitionCount": 2,
-                "status": "Active"
+                "status": "Active",
+                "partitionIds": [
+                    "0",
+                    "1"
+                ]
             },
             "dependsOn": [
-                "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaceName'))]"
+                "[resourceId('Microsoft.EventHub/namespaces', variables('namespaceName'))]"
             ]
         },
         {
-            "comments": "Generalized from resource: '/subscriptions/ed2f73c5-c021-4b86-9afb-aa7998d16085/resourcegroups/makemitgroup/providers/Microsoft.EventHub/namespaces/makemitns/eventhubs/thingdeveventhub/authorizationRules/readwrite'.",
+            "comments": "Provision the 'readwrite' Shared Access Policy.",
             "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationRules",
             "name": "[concat(parameters('namespaceName'), '/', parameters('eventHubName'), '/', parameters('authorizationRules_readwrite_name'))]",
             "apiVersion": "2017-04-01",
@@ -111,131 +115,79 @@
             ]
         },
         {
-            "comments": "Generalized from resource: '/subscriptions/ed2f73c5-c021-4b86-9afb-aa7998d16085/resourcegroups/makemitgroup/providers/Microsoft.EventHub/namespaces/makemitns/eventhubs/thingdeveventhub/consumergroups/$Default'.",
+            "comments": "Provision the $Default consumer group",
             "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
-            "name": "[concat(parameters('namespaceName'), '/', parameters('eventHubName'), '/', parameters('defaultConsumerGroupName'))]",
+            "name": "[concat(variables('namespaceName'), '/', variables('eventHubName'), '/', variables('defaultConsumerGroupName'))]",
             "apiVersion": "2017-04-01",
-            "location": "West US",
+            "location": "[variables('location')]",
             "scale": null,
             "properties": {},
             "dependsOn": [
-                "[resourceId('Microsoft.EventHub/namespaces', parameters('namespaceName'))]",
-                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('namespaceName'), parameters('eventHubName'))]"
+                "[resourceId('Microsoft.EventHub/namespaces', variables('namespaceName'))]",
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', variables('namespaceName'), variables('eventHubName'))]"
             ]
         },
         {
-            "comments": "Generalized from resource: '/subscriptions/ed2f73c5-c021-4b86-9afb-aa7998d16085/resourceGroups/makemitgroup/providers/Microsoft.Storage/storageAccounts/makemitstorage'.",
+            "comments": "Provision the Storage Account",
             "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2017-06-01",
+            "kind": "Storage",
+            "name": "[variables('storageAccountName')]",
+            "location": "[variables('location')]",
             "sku": {
                 "name": "Standard_LRS",
                 "tier": "Standard"
             },
-            "kind": "Storage",
-            "name": "[parameters('storageAccountName')]",
-            "apiVersion": "2017-10-01",
-            "location": "westus",
-            "tags": {},
-            "scale": null,
-            "properties": {
-                "networkAcls": {
-                    "bypass": "AzureServices",
-                    "virtualNetworkRules": [],
-                    "ipRules": [],
-                    "defaultAction": "Allow"
-                },
-                "supportsHttpsTrafficOnly": false,
-                "encryption": {
-                    "services": {
-                        "file": {
-                            "enabled": true
-                        },
-                        "blob": {
-                            "enabled": true
-                        }
-                    },
-                    "keySource": "Microsoft.Storage"
-                }
-            },
+            "properties": {},
             "dependsOn": []
         },
         {
-            "comments": "Generalized from resource: '/subscriptions/ed2f73c5-c021-4b86-9afb-aa7998d16085/resourceGroups/makemitgroup/providers/Microsoft.Web/serverfarms/makemitplan'.",
+            "comments": "Provision the App Services Plan.",
             "type": "Microsoft.Web/serverfarms",
             "sku": {
-                "name": "S1",
-                "tier": "Standard",
-                "size": "S1",
-                "family": "S",
-                "capacity": 1
+                "name": "S1"
             },
             "kind": "app",
-            "name": "[parameters('planName')]",
+            "name": "[variables('planName')]",
             "apiVersion": "2016-09-01",
-            "location": "West US",
-            "scale": null,
+            "location": "[variables('planName')]",
             "properties": {
-                "name": "[parameters('planName')]",
-                "workerTierName": null,
-                "adminSiteName": null,
-                "hostingEnvironmentProfile": null,
-                "perSiteScaling": false,
-                "reserved": false,
-                "targetWorkerCount": 0,
-                "targetWorkerSizeId": 0
+                "name": "[variables('planName')]",
             },
             "dependsOn": []
         },
         {
-            "comments": "Generalized from resource: '/subscriptions/ed2f73c5-c021-4b86-9afb-aa7998d16085/resourceGroups/makemitgroup/providers/Microsoft.Web/sites/makemitweb'.",
+            "comments": "Provision the Web App.",
             "type": "Microsoft.Web/sites",
             "kind": "app",
-            "name": "[parameters('webAppName')]",
+            "name": "[variables('webAppName')]",
             "apiVersion": "2016-08-01",
             "location": "West US",
-            "tags": {
-                "hidden-related:/subscriptions/ed2f73c5-c021-4b86-9afb-aa7998d16085/resourcegroups/makemitgroup/providers/Microsoft.Web/serverfarms/makemitplan": "empty"
-            },
             "scale": null,
             "properties": {
                 "enabled": true,
                 "hostNameSslStates": [
                     {
-                        "name": "[concat(parameters('webAppName'),'.azurewebsites.net')]",
+                        "name": "[concat(variables('webAppName'),'.azurewebsites.net')]",
                         "sslState": "Disabled",
-                        "virtualIP": null,
-                        "thumbprint": null,
-                        "toUpdate": null,
                         "hostType": "Standard"
                     },
                     {
-                        "name": "[concat(parameters('webAppName'),'.scm.azurewebsites.net')]",
+                        "name": "[concat(variables('webAppName'),'.scm.azurewebsites.net')]",
                         "sslState": "Disabled",
-                        "virtualIP": null,
-                        "thumbprint": null,
-                        "toUpdate": null,
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('planName'))]",
-                "reserved": false,
-                "siteConfig": null,
-                "scmSiteAlsoStopped": false,
-                "hostingEnvironmentProfile": null,
-                "clientAffinityEnabled": true,
-                "clientCertEnabled": false,
-                "hostNamesDisabled": false,
-                "containerSize": 0,
-                "dailyMemoryTimeQuota": 0,
-                "cloningInfo": null
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('planName'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]"
             ]
         },
         {
-            "comments": "Generalized from resource: '/subscriptions/ed2f73c5-c021-4b86-9afb-aa7998d16085/resourceGroups/makemitgroup/providers/Microsoft.Web/sites/makemitweb/config/web'.",
+            "comments": "Provision the Web App Config.",
             "type": "Microsoft.Web/sites/config",
-            "name": "[concat(parameters('webAppName'), '/', parameters('webAppConfigName'))]",
+            "name": "[concat(variables('webAppName'), '/', variables('webAppConfigName'))]",
             "apiVersion": "2016-08-01",
             "location": "West US",
             "tags": {
@@ -257,32 +209,7 @@
                 ],
                 "netFrameworkVersion": "v4.0",
                 "phpVersion": "5.6",
-                "pythonVersion": "",
-                "nodeVersion": "",
-                "linuxFxVersion": "",
-                "requestTracingEnabled": false,
-                "remoteDebuggingEnabled": false,
-                "remoteDebuggingVersion": null,
-                "httpLoggingEnabled": false,
-                "logsDirectorySizeLimit": 35,
-                "detailedErrorLoggingEnabled": false,
-                "publishingUsername": "[concat('$makemit', parameters('webAppConfigName'))]",
-                "publishingPassword": null,
-                "appSettings": null,
-                "metadata": null,
-                "connectionStrings": null,
-                "machineKey": null,
-                "handlerMappings": null,
-                "documentRoot": null,
-                "scmType": "LocalGit",
-                "use32BitWorkerProcess": true,
-                "webSocketsEnabled": false,
-                "alwaysOn": false,
-                "javaVersion": null,
-                "javaContainer": null,
-                "javaContainerVersion": null,
-                "appCommandLine": "",
-                "managedPipelineMode": "Integrated",
+                "publishingUsername": "[concat('$' parameters('name_prefix'), parameters('webAppConfigName'))]",
                 "virtualApplications": [
                     {
                         "virtualPath": "/",
@@ -290,74 +217,27 @@
                         "preloadEnabled": false,
                         "virtualDirectories": null
                     }
-                ],
-                "winAuthAdminState": 0,
-                "winAuthTenantState": 0,
-                "customAppPoolIdentityAdminState": false,
-                "customAppPoolIdentityTenantState": false,
-                "runtimeADUser": null,
-                "runtimeADUserPassword": null,
-                "loadBalancing": "LeastRequests",
-                "routingRules": [],
-                "experiments": {
-                    "rampUpRules": []
-                },
-                "limits": null,
-                "autoHealEnabled": false,
-                "autoHealRules": null,
-                "tracingOptions": null,
-                "vnetName": "",
-                "siteAuthEnabled": false,
-                "siteAuthSettings": {
-                    "enabled": null,
-                    "unauthenticatedClientAction": null,
-                    "tokenStoreEnabled": null,
-                    "allowedExternalRedirectUrls": null,
-                    "defaultProvider": null,
-                    "clientId": null,
-                    "clientSecret": null,
-                    "issuer": null,
-                    "allowedAudiences": null,
-                    "additionalLoginParams": null,
-                    "isAadAutoProvisioned": false,
-                    "googleClientId": null,
-                    "googleClientSecret": null,
-                    "googleOAuthScopes": null,
-                    "facebookAppId": null,
-                    "facebookAppSecret": null,
-                    "facebookOAuthScopes": null,
-                    "twitterConsumerKey": null,
-                    "twitterConsumerSecret": null,
-                    "microsoftAccountClientId": null,
-                    "microsoftAccountClientSecret": null,
-                    "microsoftAccountOAuthScopes": null
-                },
-                "cors": null,
-                "push": null,
-                "apiDefinition": null,
-                "autoSwapSlotName": null,
-                "localMySqlEnabled": false,
-                "managedServiceIdentityId": null,
-                "ipSecurityRestrictions": null
+                ]
+                
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
             ]
         },
         {
-            "comments": "Generalized from resource: '/subscriptions/ed2f73c5-c021-4b86-9afb-aa7998d16085/resourceGroups/makemitgroup/providers/Microsoft.Web/sites/makemitweb/hostNameBindings/makemitweb.azurewebsites.net'.",
+            "comments": "Provision the Web Site URL.",
             "type": "Microsoft.Web/sites/hostNameBindings",
-            "name": "[concat(parameters('webAppName'), '/', parameters('webAppUrl'))]",
+            "name": "[concat(variables('webAppName'), '/', variables('webAppUrl'))]",
             "apiVersion": "2016-08-01",
-            "location": "West US",
+            "location": "[variables('location')]",
             "scale": null,
             "properties": {
-                "siteName": "makemitweb",
+                "siteName": "[variables('webAppName')]",
                 "domainId": null,
                 "hostNameType": "Verified"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+                "[resourceId('Microsoft.Web/sites', variables('webAppName'))]"
             ]
         }
     ]
