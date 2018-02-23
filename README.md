@@ -240,47 +240,6 @@ wget -O template.json http://aka.ms/azurethingarm
 
 <a name="section1.5"></a>
 
-## 1.5 Create an Event Hub
-Event Hub is an Azure IoT publish-subscribe service that can ingest millions of events per second and stream them into multiple applications, services or devices.
-
-- Log on to the [Microsoft Azure Portal](https://portal.azure.com/)
-- Click on **New** -&gt; **Internet of Things**-&gt; **Event Hub**
-- Enter the following settings for the Event Hub Namespace (use a name of your choice for the event hub and the namespace):
-    - Name: `Your choice` (we chose `SparkFun2Suite`)
-    - Pricing Tier: `Basic`
-    - Subscription: `Your choice`
-    - Resource Group: `Your choice`
-    - Location: `Your choice`
-- Click on **Create**
-- Wait until the Event Hub Namespace is created, and then create an Event Hub using the following steps:
-    - Click on your `SparkFun2Suite` Event Hub Namespace (or pick any other name that you used)
-    - Click the **Add Event Hub**
-    - Name: `thingdevEventHub`
-- Click on **Create**
-- Wait until the new Event Bus is created
-- Click on the **Event Hubs** arrow in the **Overview** tab (might require a few clicks, until the UI is updated)
-- Select the `thingdevEventHub` eventhub and go in the **Configure** tab in the **Shared Access Policies** section, add a new policy:
-    - Name = `readwrite`
-    - Permissions = `Send, Listen`
-- Click **Save** at the bottom of the page, then click the **Dashboard** tab near the top and click on **Connection Information** at the bottom
-- _Copy down the connection string for the `readwrite` policy you created._
-- From the your IoT Hub Settings (The Resource that has connected dots) on the [Microsoft Azure Portal](https://portal.azure.com/), click the **Messaging blade** (found in your settings), write down the _Event Hub-compatible name_
-- Look at the _Event-hub-compatible Endpoint_, and write down this part: sb://**thispart**.servicebus.windows.net/ we will call this one the _IoTHub EventHub-compatible namespace_
-
-<a name="section1.6"></a>
-
-## 1.6 Create a Storage Account for Table Storage
-Now we will create a service to store our data in the cloud.
-- Log on to the [Microsoft Azure Portal](https://portal.azure.com/)
-- In the menu, click **New** and select **Data + Storage** then **Storage Account**
-    - Name: `Your choice` (we chose `thingdevstorage`)
-    - Deployment model: `Classic`
-    - Performance: `Standard`
-    - Replication: `Read-access geo-redundant storage (RA-GRS)`
-    - Subscription: `Your choice`
-    - Resource Group: `Your choice`
-    - Location: `Your choice`
-- Once the account is created, find it in the **resources blade** or click on the **pinned tile**, go to **Settings**, **Keys**, and write down the _primary connection string_.
 
 <a name="section1.7"></a>
 
@@ -292,15 +251,40 @@ Stream Analytics is an Azure IoT service that streams and analyzes data in the c
 - Enter a name for the job (We chose “SparkFunStorageJob”), a preferred region, then choose your subscription. At this stage you are also offered to create a new or to use an existing resource group. Choose the resource group you created earlier.
 - Once the job is created, open your **Job’s blade** or click on the **pinned tile**, and find the section titled _“Job Topology”_ and click the **Inputs** tile. In the Inputs blade, click on **Add**
 - Enter the following settings:
-    - Input Alias = _`TempSensors`_
+    - Input Alias = _`SensorReadings`_
     - Source Type = _`Data Stream`_
     - Source = _`IoT Hub`_
-    - IoT Hub = _`SparkFun2Suite`_ (use the name for the IoT Hub you create before)
+    - IoT Hub = _`<name_prefix>iot`_ (use the name for the IoT Hub you create before)
     - Shared Access Policy Name = _`iothubowner`_
     - Shared Access Policy Key = _The `iothubowner` primary key can be found in your IoT Hub Settings -> Shared access policies_
     - IoT Hub Consumer Group = "" (leave it to the default empty value)
     - Event serialization format = _`JSON`_
     - Encoding = _`UTF-8`_
+
+- Back to the **Stream Analytics Job blade**, click on the **Outputs** tile and in the **Outputs blade**, click on **Add**
+- Enter the following settings then click on **Create**:
+    - Output Alias = _`TemperatureRecords`_
+    - Sink = _`Table Storage`_
+    - Subscription = _`Provide table settings storage manually`_
+    - Storage account = _`<name_prefix>storage`_ (The storage account you created earlier)
+    - Storage account key = _(The primary key for the storage account made earlier, can be found in Settings -&gt; Keys -&gt; Primary Access Key)_
+    - Table Name = _`TemperatureRecords`_ (Your choice - If the table doesn’t already exist, Local Storage will create it)
+    - Partition Key = _`DeviceId`_
+    - Row Key = _`EventTime`_
+    - Batch size = _`1`_
+- Back to the **Stream Analytics Job blade**, click on the **Outputs tile**, and in the **Outputs blade**, click on **Add**
+- Enter the following settings then click on **Create**:
+    - Output Alias = _`TemperatureAlerts`_
+    - Sink = _`Event Hub`_
+    - Subscription = _`Provide table settings storage manually`_
+    - Service Bus Namespace = _`<name_prefix>ns`_
+    - Event Hub Name = _`temperaturealerts`_ (The Event Hub you made earlier)
+    - Event Hub Policy Name = _`readwrite`_
+    - Event Hub Policy Key = _`Primary Key for readwrite Policy name`_ (That's the one you wrote down after creating the event hub)
+    - Partition Key Column = _`0`_
+    - Event Serialization format = _`JSON`_
+    - Encoding = _`UTF-8`_
+    - Format = _`Line separated`_
 
 - Back to the **Stream Analytics Job blade**, click on the **Query tile** (next to the Inputs tile). In the Query settings blade, type in the below query and click **Save**:
 
@@ -310,8 +294,8 @@ SELECT
     EventTime,
     MTemperature as TemperatureReading
 INTO
-    TemperatureTableStorage
-from TempSensors
+    TemperatureRecords
+from SensorReadings
 WHERE
    DeviceId is not null
    and EventTime is not null
@@ -321,7 +305,7 @@ SELECT
     EventTime,
     MTemperature as TemperatureReading
 INTO   
-    TemperatureAlertToEventHub
+    TemperatureAlerts
 FROM
     TempSensors
 WHERE MTemperature>25
@@ -331,31 +315,8 @@ WHERE MTemperature>25
 **Note:** You can change the `25` to `0` when you're ready to generate alerts to look at. This number represents the temperature in degrees celsius to check for when creating alerts. 25 degrees celsius is 77 degrees fahrenheit.
 ***
 
-- Back to the **Stream Analytics Job blade**, click on the **Outputs** tile and in the **Outputs blade**, click on **Add**
-- Enter the following settings then click on **Create**:
-    - Output Alias = _`TemperatureTableStorage`_
-    - Sink = _`Table Storage`_
-    - Subscription = _`Provide table settings storage manually`_
-    - Storage account = _`thingdevstorage`_ (The storage account you created earlier)
-    - Storage account key = _(The primary key for the storage account made earlier, can be found in Settings -&gt; Keys -&gt; Primary Access Key)_
-    - Table Name = _`TemperatureRecords`_ (Your choice - If the table doesn’t already exist, Local Storage will create it)
-    - Partition Key = _`DeviceId`_
-    - Row Key = _`EventTime`_
-    - Batch size = _`1`_
-- Back to the **Stream Analytics Job blade**, click on the **Outputs tile**, and in the **Outputs blade**, click on **Add**
-- Enter the following settings then click on **Create**:
-    - Output Alias = _`TemperatureAlertToEventHub`_
-    - Sink = _`Event Hub`_
-    - Subscription = _`Provide table settings storage manually`_
-    - Service Bus Namespace = _`SparkFun2Suite`_
-    - Event Hub Name = _`thingdeveventhub`_ (The Event Hub you made earlier)
-    - Event Hub Policy Name = _`readwrite`_
-    - Event Hub Policy Key = _`Primary Key for readwrite Policy name`_ (That's the one you wrote down after creating the event hub)
-    - Partition Key Column = _`0`_
-    - Event Serialization format = _`JSON`_
-    - Encoding = _`UTF-8`_
-    - Format = _`Line separated`_
-- Back in the** Stream Analytics blade**, start the job by clicking on the **Start **button at the top
+
+- Back in the **Stream Analytics blade**, start the job by clicking on the **Start** button at the top, and selecting **Now** as the start time. 
 
 ***
 **Note:** Make sure to **stop** your Command Center jobs once you have when you take a break or finish to avoid unnecessary Azure consumption!  (See: [Troubleshooting](#troubleshooting))
