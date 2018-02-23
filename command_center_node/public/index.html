@@ -112,12 +112,13 @@
                     $http.post('/api/command/', {command: value});    
                 };
             
-                $http.get('/api/alerts').success(function(data) {
+                $http.get('/api/alerts').then(function(response) {
+                    var data = response.data;
                     $scope.latest_alerts = data.reverse(); 
                 });
             
-                $http.get('/api/temperatures').success(function(result) {
-                    
+                $http.get('/api/temperatures').success(function(response) {
+                    var result = response.data;
                     if(result.length > 0) {
                         angular.forEach(result, function(x) {
 
