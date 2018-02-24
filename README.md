@@ -134,16 +134,23 @@ Luckily, the Azure Portal has a built in "Cloud Shell" that we can use for this,
 
 1. When the Cloud Shell opens, confirm that "Bash" is selected from the drop down in the top left corner:
 
-    ![Bash](.img/BashCloudShell.png)
+    ![Bash](./img/BashCloudShell.png)
 
 1. In the new cloud shell panel at the bottom of the portal, Download the ARM template we'll use by running:
+
+    > **Note**: This steps is simply downloading the arm template.json file from the github repo into your cloud shell storage so you can use it. 
 
 ```bash
 wget -O template.json http://aka.ms/azurethingarm
 ```
 
-1. Before we create any resources, we want to come up with a consistent name prefix that we will use to name all of our resources.  If you are at a hackathon, perhaps use your team name, or make a combination of your initials, and the event name.  For this example, my initials are `bss` and I'm at `MakeMIT` so I'll  use.  Whatever you choose, use it consistently:
+1. Before we create any resources, we want to come up with a consistent name prefix that we will use to name all of our resources.  If you are at a hackathon, perhaps use your team name, or make a combination of your initials, and the event name.  Whatever you choose, use it consistently.  In addition you need the name prefix you choose to:
 
+    - be a valid hostname
+    - not include any special characters like (`@`,`:`,`-`,`?`, etc).  Just keep it simple
+    - it MUST be at least four (4) characters long.  Why?  The service bus name space name has to be at least six (6) characters long, and the template you use later appends `ns` to the end of your prefix to come up with the namespace name.  Since only two characters are appended, you need at least four in your prefix to meet the minimum of six. 
+
+1. For this example, my initials are `bss` and I'm at `MakeMIT` so I'll  use"
     ```bash
     bssmakemit
     ```
