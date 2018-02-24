@@ -9,7 +9,7 @@ something quick and simple, try one of these:
 This page contains technical information to help you get familiar with Azure IoT using the Azure IoT Starter Kit - SparkFun ESP8266 Thing Dev Kit (Arduino-compatible). In this tutorial, you will leverage Azure IoT services to create your own IoT solution.
 
 ***
-**Don't have a kit yet?:** Click [here](http://azure.com/iotstarterkits)
+**Don't have a kit yet?:** Click [here](https://www.sparkfun.com/products/13799)
 ***
 
 # Using Microsoft Azure IoT Services to Identify Temperature Anomalies
@@ -23,16 +23,14 @@ This tutorial describes the process of taking your Microsoft Azure IoT Starter K
   - [1.2.1 Required Software](#section1.2.1)
   - [1.2.2 Required Hardware](#section1.2.2)
 - [1.3 Connect the Sensor Module to your Device](#section1.3)
-- [1.4 Create a New Microsoft Azure IoT Hub and Add Device](#section1.4)
-- [1.5 Create an Event Hub](#section1.5)
-- [1.6 Create a Storage Account for Table Storage](#section1.6)
-- [1.7 Create a Stream Analytics job to Save IoT Data in Table Storage and Raise Alerts](#section1.7)
-- [1.8 Node Application Setup](#section1.8)
-- [1.9 Add the SparkFun ESP8266 Thing Dev Kit to the Arduino IDE](#section1.9)
-- [1.10 Install Library Dependencies](#section1.10)
-- [1.11 Modify the Command Center Sample](#section1.11)
-- [1.12 Build Your Command Center Sample](#section1.12)
-- [1.13 Next steps](#section1.13)
+- [1.4 Provision the Azure Resources](#section1.4)
+- [1.5 Create a Stream Analytics job to Save IoT Data in Table Storage and Raise Alerts](#section1.7)
+- [1.6 Node Application Setup](#section1.8)
+- [1.7 Add the SparkFun ESP8266 Thing Dev Kit to the Arduino IDE](#section1.9)
+- [1.8 Install Library Dependencies](#section1.10)
+- [1.9 Modify the Command Center Sample](#section1.11)
+- [1.10 Build Your Command Center Sample](#section1.12)
+- [1.11 Next steps](#section1.13)
 
 
 ## 1.1 Tutorial Overview
@@ -243,7 +241,7 @@ wget -O template.json http://aka.ms/azurethingarm
 
 <a name="section1.7"></a>
 
-## 1.7 Create a Stream Analytics job to Save IoT Data in Table Storage and Raise Alerts
+## 1.5 Create a Stream Analytics job to Save IoT Data in Table Storage and Raise Alerts
 Stream Analytics is an Azure IoT service that streams and analyzes data in the cloud. We'll use it to process data coming from your device.
 
 - Log on to the [Microsoft Azure Portal](https://portal.azure.com/)
@@ -324,7 +322,7 @@ WHERE MTemperature>25
 
 <a name="section1.8"></a>
 
-## 1.8 Node Application Setup
+## 1.6 Node Application Setup
 
  - If you do not have it already, install Node.js and NPM.
    - Windows and Mac installers can be found here: https://nodejs.org/en/download/
@@ -418,7 +416,7 @@ Next, we will update your device so that it can interact with all the things you
 
 <a name="section1.9"></a>
 
-## 1.9 Add the SparkFun ESP8266 Thing Dev Kit to the Arduino IDE
+## 1.7 Add the SparkFun ESP8266 Thing Dev Kit to the Arduino IDE
 
 You will need to install the SparkFun ESP8266 Thing Dev Kit board extension for the Arduino IDE:
 
@@ -428,7 +426,7 @@ You will need to install the SparkFun ESP8266 Thing Dev Kit board extension for 
 
 <a name="section1.10"></a>
 
-## 1.10 Install Library Dependencies
+## 1.8 Install Library Dependencies
 
 For this project, we'll also need the following libraries:
 
@@ -444,7 +442,7 @@ The Adafruit Sensor library is also needed. This can be downloaded [here](https:
 
 <a name="section1.11"></a>
 
-## 1.11 Modify the Command Center sample
+## 1.9 Modify the Command Center sample
 
 - Unzip the example code, and double-click the file `command_center.ino` to open the project in the Arduino IDE.
 - You will be prompted to creat a folder. Do this, and move the other files in the folder into the newly created child folder
@@ -472,7 +470,7 @@ static const char connectionString[] = "[Device Connection String]";
 
 <a name="section1.12"></a>
 
-## 1.12 Build Your Command Center Sample
+## 1.10 Build Your Command Center Sample
 
 - Build and upload the code using **Sketch -&gt;  Upload**.
 
@@ -551,7 +549,7 @@ Head back to your Node application and you will have a fully functional command 
 
 <a name="section1.13"></a>
 
-## 1.13 Next steps
+## 1.11 Next steps
 
 Please visit our [Azure IoT Dev Center](https://azure.microsoft.com/en-us/develop/iot/) for more samples and documentation on Azure IoT.
 
