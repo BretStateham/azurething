@@ -425,68 +425,76 @@ Next, we will update your device so that it can interact with all the things you
 
 ## 1.7 Add the SparkFun ESP8266 Thing Dev Kit to the Arduino IDE
 
-You will need to install the SparkFun ESP8266 Thing Dev Kit board extension for the Arduino IDE:
+1. Locate the `command_center` folder where you extracted the content for this workshop, and double-click the file `command_center.ino` to open the project in the Arduino IDE.
 
-- Follow the instructions here: https://learn.sparkfun.com/tutorials/esp8266-thing-development-board-hookup-guide. There you will see how to add a URL pointing to Spark's repository of board extensions, how to make the SparkFun ESP8266 Thing Dev Kit board selectable under the **Tools** menu, and how to get the Blink sketch to run.
-- After going through this, you should have a working sample with a blinking light on your board.
-    - If you can’t upload the sample, reconnect the device, then the power switch to OFF. Press the upload button, and flip the switch back to ON.
+1. You will need to install the SparkFun ESP8266 Thing Dev Kit board extension for the Arduino IDE.  From the Arduino IDE menu bar, select "**File**" | "**Preferences**".  Paste the following URL into the `Additional Board Manager URLs` text box:
+
+    ```text
+    http://arduino.esp8266.com/stable/package_esp8266com_index.json
+    ```
+
+    ![Boards Manger URL](./img/boardmanagerurl.png)
+
+1. Next, from the Arduino IDE menu bar, select "**Tools**" | "**Board: '...'**" | "**Boards Manager...**".  Search for the `esp8266` in the filter box, and select the "**esp8266**" board manager and click "**Install**".  Then click "**Close**"
+
+    ![esp8266 Board Manager Install](./img/esp8266boardmanager.png)
+
+1. Once again, from the menu bar select "**Tools**" | "**Board: '...'**" | "**SparkFun ESP8266 Thing Dev**":
+
+    ![Select the SparkFun ESP8266 Thing Dev](./img/selectthing.png)
+
+1. Ensure that the SparkFun Thing dev board is connected to your computer using the USB cable and turned on.  You should see a red power light on the board.
+
+1. On a windows machine 
+
+1. Next from the menu board, select "**Tools**" | "**Port**" and select the port that your board is connected to.
+
+1. And then, again under the tools menu, confirm the other settings for the board match:
+
+ - **Flash Size**: `"512K (no SPIFFS)"`
+ - **Debug port**: `"Disabled"`
+ - **Debug Level**: `"None"`
+ - **IwIP Variant**: `"v2 Prebuilt (MSS=536)"`
+ - **CPU Frequency**: `"80 Mhz"`
+ - **Upload Speed**: `"115200"`
+
+1. If you have problems completing the steps above, you can try the more detailed steps outlined in the [ESP8266 Thing Development Board Hookup Guide](https://learn.sparkfun.com/tutorials/esp8266-thing-development-board-hookup-guide).
+
 
 <a name="section1.10"></a>
 
 ## 1.8 Install Library Dependencies
 
-For this project, we'll also need the following libraries:
+1. We need to install a number of Arduino libraries.  To do so, on click on the "**Sketch**" | "**Include Library**" | "**Manage Libraries...**". Search for each library using the box in the upper-right to filter your search, click on the found library, and click the "Install" button.  Here's the list of libraries to install:
 
- - DHT Sensor Library
- - Adafruit DHT Unified
- - AzureIoTHub
- - AzureIoTUtility
- - AzureIoTProtocol_MQTT
-
-To install them, click on the `Sketch -> Include Library -> Manage Libraries`. Search for each library using the box in the upper-right to filter your search, click on the found library, and click the "Install" button.
-
-The Adafruit Sensor library is also needed. This can be downloaded [here](https://github.com/adafruit/Adafruit_Sensor). Instructions for manually installing a library can be found [here](https://www.arduino.cc/en/Guide/Libraries).
+ - `Adafruit Unified Sensor` - [more info](https://github.com/adafruit/Adafruit_Sensor)
+ - `DHT sensor library` by Adafruit - [more info](https://github.com/adafruit/DHT-sensor-library)
+ - `AzureIoTHub` - [more info](https://github.com/Azure/azure-iot-arduino)
+ - `AzureIoTProtocol_MQTT` - [more info](https://github.com/andriyadi/AzureIoTHubMQTTClient)
+ - `AzureIoTUtility` - [more info](https://github.com/Azure/azure-iot-arduino-utility)
 
 <a name="section1.11"></a>
 
 ## 1.9 Modify the Command Center sample
 
-- Unzip the example code, and double-click the file `command_center.ino` to open the project in the Arduino IDE.
-- You will be prompted to creat a folder. Do this, and move the other files in the folder into the newly created child folder
-- Look for the following lines of code:
+1. Open the `iot_configs.h` file in the Arduino IDE, and change the values for the `IOT_CONFIG_WIFI_SSID`, `IOT_CONFIG_WIFI_PASSWORD`, `IOT_CONFIG_DEVICE_ID`, `IOT_CONFIG_DEVICE_CONNECTION_STRING`:
 
-```
-static const char ssid[] = "[Your WiFi network SSID or name]";
-static const char pass[] = "[Your WiFi network WPA password or WEP key]";
-static const char* connectionString = "[Device Connection String]";
-```
+    > **Note**: Use the WiFi SSID and Password for your network.  Make sure the network only requires the SSID and Password and no additional steps to connect.  If the network doesn't require a password, just delete the place holder, and leave empty quotes, `""`.  Use the device ID and connection string you captured previously when you created your IoT Device Identity in the Azure IoT Hub:
 
-- Replace the placeholders with your WiFi name (SSID), WiFi password, and the device connection string you created at the beginning of this tutorial. 
-- Save with `Control-s`
+    ![iot_configs.h](./img/iot_configs.h.png)
 
-- In the same project, click on the `command_center.c` tab to see that file.
-- Look for the following lines of code:
-
-```
-static const char DeviceId[] = "[Device Name]";
-static const char connectionString[] = "[Device Connection String]";
-```
-
-- Replace the placeholders with your Device ID and connection string you created at the beginning of this tutorial. 
-- Save with `Control-s`
+1. Save your changes with `Control-s`, or "**File**" | "**Save**" from the Arduino IDE menu bar.
 
 <a name="section1.12"></a>
 
 ## 1.10 Build Your Command Center Sample
 
-- Build and upload the code using **Sketch -&gt;  Upload**.
+1. Make sure your changes compile by selecting "**Sketch**" |  "**Verify/Compile**" from the Arduino IDE menu bar.  If you get any errors, resolve them and re-compile to ensure it compiles.
 
-***
-**Note**: As of 1.6.8, the Arduino IDE doesn't properly show "Upload Completed", even when it succeeds.
-***
+1. Build and upload the code by selecting "**Sketch**" |  "**Upload**" from the Arduino IDE menu bar.
 
-- There should now be a green LED on your SparkFun ESP8266 Thing Dev Kit. Re-select the COM port if necessary, and then open the Serial Monitor. After 15 seconds you should see a measurements update.
-- Data is now being sent off at regular intervals to Microsoft Azure. When it detects something out of range, you will see the LED you’ve set up turn from green to red!
+    > **Note**: Depending on your version of the Arduino IDE, it may not show "Upload Completed" when it the code is done uploading to the device.
+
 - You can click the green button (labeled "Turn on") and the red button (labeled "Turn off") in the application to toggle the green and red LEDs in your kit.
 
 Head back to your Node application and you will have a fully functional command center, complete with a history of sensor data, alerts that display when the temperature got outside a certain range, and commands that you can send to your device remotely.

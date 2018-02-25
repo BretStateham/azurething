@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
+#include "iot_configs.h"
 #include <stdlib.h>
 
 #include <stdio.h>
@@ -26,9 +26,8 @@ and removing calls to _DoWork will yield the same results. */
 #define  IOT_AGENT_OK CODEFIRST_OK
 #endif // ! IOT_AGENT_OK
 
-//static const char* connectionString = "HostName=[host].azure-devices.net;DeviceId=[device];SharedAccessKey=[key]";
-static const char DeviceId[] = "[Device Name]";
-static const char connectionString[] = "[Device Connection String]";
+static const char DeviceId[] = IOT_CONFIG_DEVICE_ID;
+static const char connectionString[] = IOT_CONFIG_CONNECTION_STRING;
 
 static int redLedPin = 12;
 static int redLedState = LOW;

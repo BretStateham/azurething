@@ -2,7 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 // This example only works with Arduino IDE 1.6.8 or later.
-
+#include "iot_configs.h"
 #include <ESP8266WiFi.h>
 #include <time.h>
 #include "command_center.h"
@@ -11,10 +11,16 @@
 #include <AzureIoTProtocol_MQTT.h>
 #endif
 
-const char ssid[] = "[SSID]"; //  your WiFi SSID (name)
-const char pass[] = "[PASSWORD]";    // your WiFi password (use for WPA, or use as key for WEP)
-const char connectionString[] = "HostName=[HubName].azure-devices.net;DeviceId=[DeviceName];SharedAccessKey=[KEY]";
+
+static char ssid[] = IOT_CONFIG_WIFI_SSID;
+static char pass[] = IOT_CONFIG_WIFI_PASSWORD;
+
 int status = WL_IDLE_STATUS;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void loop() {
+  // Not used.
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void initSerial() {
@@ -60,6 +66,7 @@ void initTime() {
     }
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void setup() {
     initSerial();
@@ -69,11 +76,5 @@ void setup() {
     // This function doesn't exit.
     command_center_run();
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-void loop() {
-  // Not used.
-}
-
 
 
